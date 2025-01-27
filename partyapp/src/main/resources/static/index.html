@@ -1,24 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebSocket Test</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.2/sockjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js" integrity="sha512-tL4PIUsPy+Rks1go4kQG8M8/ItpRMvKnbBjQm4d2DQnFwgcBYRRN00QdyQnWSCwNMsoY/MfJY8nHp2CzlNdtZA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
-<h1>WebSocket Test</h1>
-<ul id="messages"></ul>
-<script>
-    const socket = new SockJS('/ws');
-    const stompClient = Stomp.over(socket);
+<h2>WebSocket Client</h2>
 
-    stompClient.connect({}, () => {
-        stompClient.subscribe('/topic/songs', (message) => {
-            const song = message.body;
-            const messages = document.getElementById("messages");
-            const li = document.createElement("li");
-            li.appendChild(document.createTextNode(song));
-            messages.appendChild(li);
+<script>
+    // Establish connection to the WebSocket server
+    var socket = new SockJS('http://localhost:8080/ws');
+    var stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function(frame) {
+        console.log('Connected: ' + frame);
+
+        // Subscribe to /topic/messages
+        stompClient.subscribe('/topic/songs', function(messageOutput) {
+            console.log('Received message: ' + messageOutput.body);
         });
     });
 </script>

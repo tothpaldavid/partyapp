@@ -24,6 +24,17 @@ public class UserController {
         return ResponseEntity.ok(registeredUser);
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@RequestBody User user) {
+        boolean isValid = userService.validateUser(user);
+        System.out.println(user.toString());
+        if (isValid) {
+            return ResponseEntity.ok("Login successful");
+        } else {
+            return ResponseEntity.status(401).body("Invalid credentials");
+        }
+    }
+
     // Felhasználó keresése email alapján
     @GetMapping("/email/{email}")
     public ResponseEntity<User> getUserByEmail(@PathVariable String email) {

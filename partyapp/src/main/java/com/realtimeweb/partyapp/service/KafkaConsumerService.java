@@ -9,18 +9,20 @@ import org.springframework.stereotype.Service;
 public class KafkaConsumerService {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final SongService songService;
 
-    public KafkaConsumerService(SimpMessagingTemplate messagingTemplate) {
+    public KafkaConsumerService(SimpMessagingTemplate messagingTemplate, SongService songService) {
         this.messagingTemplate = messagingTemplate;
+        this.songService = songService;
     }
 
     @KafkaListener(topics = "song-requests", groupId = "party-app")
     public void consume(ConsumerRecord<String, String> record) {
         String topic = record.topic();
-        String key = record.key();
-        String value = record.value();
-
-        System.out.printf("Consumed message from topic %s: key = %s, value = %s%n", topic, key, value);
-        messagingTemplate.convertAndSend("/topic/songs", value);
+        String roomId = record.key();
+        String title = record.value();
+        songService.addSongRequest(title, roomId);
+        System.out.printf("Consumed message from topic %s: roomId = %s, value = %s%n", topic, roomId, title);
+//        messagingTemplate.convertAndSend("/topic/songs", value);
     }
 }

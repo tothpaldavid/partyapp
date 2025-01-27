@@ -21,18 +21,6 @@ public class SongController {
         this.kafkaProducerService = kafkaProducerService;
     }
 
-    // Új zenekérés hozzáadása
-    @PostMapping
-    public ResponseEntity<Song> addSongRequest(@RequestBody Song song) {
-        // Új zenekérés mentése az adatbázisba
-        Song createdSong = songService.addSongRequest(song);
-
-        // Kafka üzenet küldése
-        kafkaProducerService.sendMessage("song-requests", String.format("New song requested: %s", createdSong.getTitle()));
-
-        return ResponseEntity.ok(createdSong);
-    }
-
     // Zenék listázása szoba ID alapján
     @GetMapping("/room/{roomId}")
     public ResponseEntity<List<Song>> getSongsByRoomId(@PathVariable String roomId) {
@@ -70,7 +58,7 @@ public class SongController {
         updatedSong.ifPresent(song -> {
             String feedbackType = like ? "like" : "dislike";
             // Kafka üzenet küldése
-            kafkaProducerService.sendMessage("song-feedback", String.format("Song %s updated: %s (%d likes, %d dislikes)",
+            kafkaProducerService.sendMessage("song-updates", String.format("Song %s updated: %s (%d likes, %d dislikes)",
                     feedbackType, song.getTitle(), song.getLikes(), song.getDislikes()));
         });
 
